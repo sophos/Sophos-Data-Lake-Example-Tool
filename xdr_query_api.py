@@ -38,8 +38,6 @@ class XDRQueryAPI:
             "tenantIds":[
                 "%s"
             ],
-            "deviceIds":[
-            ],
             "queryFormat":"sql",
             "adHocQuery":{
                "name":"%s",
