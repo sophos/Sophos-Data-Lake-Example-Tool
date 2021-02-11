@@ -17,6 +17,7 @@ import argparse
 import json
 import logging
 
+import random
 import requests
 from retry import retry
 from tabulate import tabulate
@@ -33,7 +34,16 @@ class XDRQueryAPI:
         self.executions_route = 'xdr-query/v1/queries/runs'
         self.content_type = 'application/json'
 
-        self.query_template = '''{"tenantIds": ["%s"],"deviceIds":[],"queryFormat":"sql","queryText":%s}'''
+        self.query_template = '''{
+            "tenantIds":[
+                "%s"
+            ],
+            "queryFormat":"sql",
+            "adHocQuery":{
+               "name":"%s",
+               "template": %s
+            }
+        }'''
 
         self.environment_urls = {'whoamiURL': 'https://api.central.sophos.com/whoami/v1',
                                  'tokenURL': 'https://id.sophos.com/api/v2/oauth2/token'}
@@ -136,8 +146,8 @@ class XDRQueryAPI:
             'Authorization': 'Bearer ' + authorization,
             'X-Tenant-Id': tenant_id
         }
-
-        templated_query = self.query_template % (tenant_id, json.dumps(query_text))
+        query_name = random.getrandbits(128)
+        templated_query = self.query_template % (tenant_id, query_name, json.dumps(query_text))
 
         execution_id = self.start_query(templated_query, url, headers)
 
